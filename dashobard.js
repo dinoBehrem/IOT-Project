@@ -33,7 +33,7 @@ pump_1.on("value", function (snapshot) {
 
   if (tempElement && timeElement && isMalfunctioning && pumpImg) {
     tempElement.innerText = dataArray.temperature + "°C";
-    timeElement.innerText = convertTime(dataArray.activeHorus);
+    timeElement.innerText = dataArray.activeHours + "H";
     isMalfunctioning.setAttribute(
       "style",
       dataArray.isMalfunctioning ? "color:red" : "color:green"
@@ -59,7 +59,7 @@ pump_2.on("value", (snapshot) => {
 
   if (tempElement && timeElement && isMalfunctioning && pumpImg) {
     tempElement.innerText = dataArray.temperature + "°C";
-    timeElement.innerText = convertTime(dataArray.activeHours);
+    timeElement.innerText = dataArray.activeHours + "H";
     isMalfunctioning.setAttribute(
       "style",
       dataArray.isMalfunctioning ? "color:red" : "color:green"
@@ -85,7 +85,7 @@ pump_3.on("value", (snapshot) => {
 
   if (tempElement && timeElement && isMalfunctioning && pumpImg) {
     tempElement.innerText = dataArray.temperature + "°C";
-    timeElement.innerText = convertTime(dataArray.activeHours);
+    timeElement.innerText = dataArray.activeHours + "H";
     isMalfunctioning.setAttribute(
       "style",
       dataArray.isMalfunctioning ? "color:red" : "color:green"
@@ -111,7 +111,7 @@ pump_4.on("value", (snapshot) => {
 
   if (tempElement && timeElement && isMalfunctioning && pumpImg) {
     tempElement.innerText = dataArray.temperature + "°C";
-    timeElement.innerText = convertTime(dataArray.activeHours);
+    timeElement.innerText = dataArray.activeHours + "H";
     isMalfunctioning.setAttribute(
       "style",
       dataArray.isMalfunctioning ? "color:red" : "color:green"
@@ -125,13 +125,3 @@ pump_4.on("value", (snapshot) => {
     console.error("Elements for Pump 3 not found");
   }
 });
-
-// utils
-function convertTime(number) {
-  if (number == 0) {
-    return "0:0";
-  }
-  let active_time = parseInt(number / 60) + ":" + (number % 60);
-
-  return active_time;
-}
