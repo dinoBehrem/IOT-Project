@@ -16,6 +16,17 @@ firebase.analytics();
 
 let firestore = firebase.firestore();
 
+// Number filed
+let number = firebase.database().ref("randomNumber");
+
+function UpdateNumber() {
+  var element = document.getElementById("randomNumber");
+
+  number.set(parseInt(element.value));
+}
+
+
+
 //firebase data
 let pump_1 = firebase.database().ref("pumpe/pump1");
 let pump_2 = firebase.database().ref("pumpe/pump2");
@@ -28,16 +39,13 @@ pump_1.on("value", function (snapshot) {
 
   const tempElement = document.querySelectorAll(".fa-thermometer-half")[0];
   const timeElement = document.querySelectorAll(".fa-stopwatch")[0];
-  const isMalfunctioning = document.querySelectorAll(".fa-ban")[0];
+  const restHours = document.querySelectorAll(".fa-ban")[0];
   const pumpImg = document.querySelectorAll("img")[0];
 
-  if (tempElement && timeElement && isMalfunctioning && pumpImg) {
+  if (tempElement && timeElement && restHours && pumpImg) {
     tempElement.innerText = dataArray.temperature + "°C";
     timeElement.innerText = dataArray.activeHours + "H";
-    isMalfunctioning.setAttribute(
-      "style",
-      dataArray.isMalfunctioning ? "color:red" : "color:green"
-    );
+    restHours.innerText = dataArray.restHours + "H"
 
     pumpImg.setAttribute(
       "style",
@@ -54,16 +62,13 @@ pump_2.on("value", (snapshot) => {
 
   const tempElement = document.querySelectorAll(".fa-thermometer-half")[1];
   const timeElement = document.querySelectorAll(".fa-stopwatch")[1];
-  const isMalfunctioning = document.querySelectorAll(".fa-ban")[1];
+  const restHours = document.querySelectorAll(".fa-ban")[1];
   const pumpImg = document.querySelectorAll("img")[1];
 
-  if (tempElement && timeElement && isMalfunctioning && pumpImg) {
+  if (tempElement && timeElement && restHours && pumpImg) {
     tempElement.innerText = dataArray.temperature + "°C";
     timeElement.innerText = dataArray.activeHours + "H";
-    isMalfunctioning.setAttribute(
-      "style",
-      dataArray.isMalfunctioning ? "color:red" : "color:green"
-    );
+    restHours.innerText = dataArray.restHours + "H"
 
     pumpImg.setAttribute(
       "style",
@@ -80,16 +85,13 @@ pump_3.on("value", (snapshot) => {
 
   const tempElement = document.querySelectorAll(".fa-thermometer-half")[2];
   const timeElement = document.querySelectorAll(".fa-stopwatch")[2];
-  const isMalfunctioning = document.querySelectorAll(".fa-ban")[2];
+  const restHours = document.querySelectorAll(".fa-ban")[2];
   const pumpImg = document.querySelectorAll("img")[2];
 
-  if (tempElement && timeElement && isMalfunctioning && pumpImg) {
+  if (tempElement && timeElement && restHours && pumpImg) {
     tempElement.innerText = dataArray.temperature + "°C";
     timeElement.innerText = dataArray.activeHours + "H";
-    isMalfunctioning.setAttribute(
-      "style",
-      dataArray.isMalfunctioning ? "color:red" : "color:green"
-    );
+    restHours.innerText = dataArray.restHours + "H"
 
     pumpImg.setAttribute(
       "style",
@@ -106,16 +108,13 @@ pump_4.on("value", (snapshot) => {
 
   const tempElement = document.querySelectorAll(".fa-thermometer-half")[3];
   const timeElement = document.querySelectorAll(".fa-stopwatch")[3];
-  const isMalfunctioning = document.querySelectorAll(".fa-ban")[3];
+  const restHours = document.querySelectorAll(".fa-ban")[3];
   const pumpImg = document.querySelectorAll("img")[3];
 
-  if (tempElement && timeElement && isMalfunctioning && pumpImg) {
+  if (tempElement && timeElement && restHours && pumpImg) {
     tempElement.innerText = dataArray.temperature + "°C";
     timeElement.innerText = dataArray.activeHours + "H";
-    isMalfunctioning.setAttribute(
-      "style",
-      dataArray.isMalfunctioning ? "color:red" : "color:green"
-    );
+    restHours.innerText = dataArray.restHours + "H"
 
     pumpImg.setAttribute(
       "style",

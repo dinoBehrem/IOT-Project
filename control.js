@@ -14,6 +14,14 @@ firebase.analytics();
 
 let firestore = firebase.firestore();
 
+let number = firebase.database().ref("randomNumber");
+
+number.on("value", function(value) {
+  var data = value.val();
+
+  document.getElementById("randomNumber").innerText = data;
+});
+
 const pumps = {
   pump1: firebase.database().ref("pumpe/pump1"),
   pump2: firebase.database().ref("pumpe/pump2"),
@@ -21,18 +29,14 @@ const pumps = {
   pump4: firebase.database().ref("pumpe/pump4"),
 };
 
-// Your existing Firebase configuration and setup here...
-
-// Function to activate a pump
 function activatePump(pumpRef) {
   pumpRef.update({
     isActive: true,
-    restHours: 0, // Reset rest hours when pump is activated
+    restHours: 0,
   });
-  startActiveHoursTimer(pumpRef); // Start the activeHours timer
+  startActiveHoursTimer(pumpRef);
 }
 
-// Function to rest a pump
 function restPump(pumpRef) {
   pumpRef.update({
     isActive: false,
@@ -40,7 +44,22 @@ function restPump(pumpRef) {
   });
 }
 
-// Function to start the activeHours timer for a pump
+function updatePumpTemperature(pumpId, inputElementId) {
+    const temperatureValue = parseInt(document.getElementById(inputElementId).value);
+    
+    if (!isNaN(temperatureValue)) {
+        updateTemperature(pumps[pumpId], temperatureValue);
+    } else {
+        console.error("Invalid temperature value");
+    }
+}
+
+function updateTemperature(pumpRef, newTemperature) {
+    pumpRef.update({
+        temperature: newTemperature
+    });
+}
+
 function startActiveHoursTimer(pumpRef) {
   const intervalId = setInterval(() => {
     pumpRef.once("value").then((snapshot) => {
@@ -57,72 +76,61 @@ function startActiveHoursTimer(pumpRef) {
           temperature: pump.temperature + temperatureIncrease,
         });
         if (pump.activeHours >= 8 || pump.temperature > 80) {
-          // Check if the pump should go to rest mode
           restPump(pumpRef);
-          clearInterval(intervalId); // Stop the timer when the pump goes to rest mode
+          clearInterval(intervalId);
           switchPumps();
         }
       } else {
-        clearInterval(intervalId); // Stop the timer if the pump is no longer active
+        clearInterval(intervalId);
       }
     });
-  }, 3000); // 1 hour in milliseconds
+  }, 3000);
 }
 
-// Function to switch pumps based on conditions
 function switchPumps() {
-  Promise.all(Object.values(pumps).map((ref) => ref.once("value"))).then(
-    (snapshots) => {
-      const pumpData = snapshots.map((snapshot) => snapshot.val());
-      const activePumps = [];
-      const restingPumps = [];
+    Promise.all(Object.values(pumps).map(ref => ref.once("value"))).then(snapshots => {
+        const pumpData = snapshots.map(snapshot => snapshot.val());
+        const activePumps = [];
+        const restingPumps = [];
 
-      // Separate active and resting pumps
-      pumpData.forEach((pump, index) => {
-        if (pump.isActive) {
-          activePumps.push({ pump, ref: Object.values(pumps)[index] });
-        } else {
-          restingPumps.push({ pump, ref: Object.values(pumps)[index] });
-        }
-      });
-
-      // Check active pumps for conditions to switch
-      activePumps.forEach(({ pump, ref }) => {
-        if (pump.activeHours >= 8 || pump.temperature > 80) {
-          restPump(ref);
-
-          // Activate the first available resting pump
-          for (let i = 0; i < restingPumps.length; i++) {
-            const restingPump = restingPumps[i];
-            if (
-              restingPump.pump.restHours >= 4 &&
-              restingPump.pump.temperature < 40
-            ) {
-              activatePump(restingPump.ref);
-              restingPumps.splice(i, 1); // Remove the activated pump from the resting list
-              break; // Only activate one pump
+        pumpData.forEach((pump, index) => {
+            if (pump.isActive) {
+                activePumps.push({ pump, ref: Object.values(pumps)[index] });
+            } else {
+                restingPumps.push({ pump, ref: Object.values(pumps)[index] });
             }
-          }
-        }
-      });
-    }
-  );
+        });
+
+        activePumps.forEach(({ pump, ref }) => {
+            if (pump.activeHours >= 8 || pump.temperature > 80) {
+                restPump(ref);
+
+                for (let i = 0; i < restingPumps.length; i++) {
+                    const restingPump = restingPumps[i];
+                    if (restingPump.pump.restHours >= 4 && restingPump.pump.temperature < 40) {
+                        activatePump(restingPump.ref);
+                        restingPumps.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+        });
+    });
 }
 
-// Set Pump 1 and Pump 2 as active when the app starts
 window.onload = function () {
   activatePump(pumps.pump1);
   activatePump(pumps.pump2);
+  restPump(pumps.pump3);
+  restPump(pumps.pump4);
 };
 
-// Listen for changes and manage pumps accordingly
 Object.values(pumps).forEach((pumpRef) => {
   pumpRef.on("value", () => {
     switchPumps();
   });
 });
 
-// Timer to increase restHours for inactive pumps
 setInterval(() => {
   Object.entries(pumps).forEach(([key, pumpRef]) => {
     pumpRef.once("value").then((snapshot) => {
@@ -151,4 +159,4 @@ setInterval(() => {
       }
     });
   });
-}, 3000); // 1 hour in milliseconds
+}, 3000);
