@@ -14,14 +14,6 @@ firebase.analytics();
 
 let firestore = firebase.firestore();
 
-let number = firebase.database().ref("randomNumber");
-
-number.on("value", function(value) {
-  var data = value.val();
-
-  document.getElementById("randomNumber").innerText = data;
-});
-
 const pumps = {
   pump1: firebase.database().ref("pumpe/pump1"),
   pump2: firebase.database().ref("pumpe/pump2"),
@@ -45,19 +37,21 @@ function restPump(pumpRef) {
 }
 
 function updatePumpTemperature(pumpId, inputElementId) {
-    const temperatureValue = parseInt(document.getElementById(inputElementId).value);
-    
-    if (!isNaN(temperatureValue)) {
-        updateTemperature(pumps[pumpId], temperatureValue);
-    } else {
-        console.error("Invalid temperature value");
-    }
+  const temperatureValue = parseInt(
+    document.getElementById(inputElementId).value
+  );
+
+  if (!isNaN(temperatureValue)) {
+    updateTemperature(pumps[pumpId], temperatureValue);
+  } else {
+    console.error("Invalid temperature value");
+  }
 }
 
 function updateTemperature(pumpRef, newTemperature) {
-    pumpRef.update({
-        temperature: newTemperature
-    });
+  pumpRef.update({
+    temperature: newTemperature,
+  });
 }
 
 function startActiveHoursTimer(pumpRef) {
@@ -88,34 +82,39 @@ function startActiveHoursTimer(pumpRef) {
 }
 
 function switchPumps() {
-    Promise.all(Object.values(pumps).map(ref => ref.once("value"))).then(snapshots => {
-        const pumpData = snapshots.map(snapshot => snapshot.val());
-        const activePumps = [];
-        const restingPumps = [];
+  Promise.all(Object.values(pumps).map((ref) => ref.once("value"))).then(
+    (snapshots) => {
+      const pumpData = snapshots.map((snapshot) => snapshot.val());
+      const activePumps = [];
+      const restingPumps = [];
 
-        pumpData.forEach((pump, index) => {
-            if (pump.isActive) {
-                activePumps.push({ pump, ref: Object.values(pumps)[index] });
-            } else {
-                restingPumps.push({ pump, ref: Object.values(pumps)[index] });
+      pumpData.forEach((pump, index) => {
+        if (pump.isActive) {
+          activePumps.push({ pump, ref: Object.values(pumps)[index] });
+        } else {
+          restingPumps.push({ pump, ref: Object.values(pumps)[index] });
+        }
+      });
+
+      activePumps.forEach(({ pump, ref }) => {
+        if (pump.activeHours >= 8 || pump.temperature > 80) {
+          restPump(ref);
+
+          for (let i = 0; i < restingPumps.length; i++) {
+            const restingPump = restingPumps[i];
+            if (
+              restingPump.pump.restHours >= 3 &&
+              restingPump.pump.temperature < 50
+            ) {
+              activatePump(restingPump.ref);
+              restingPumps.splice(i, 1);
+              break;
             }
-        });
-
-        activePumps.forEach(({ pump, ref }) => {
-            if (pump.activeHours >= 8 || pump.temperature > 80) {
-                restPump(ref);
-
-                for (let i = 0; i < restingPumps.length; i++) {
-                    const restingPump = restingPumps[i];
-                    if (restingPump.pump.restHours >= 4 && restingPump.pump.temperature < 40) {
-                        activatePump(restingPump.ref);
-                        restingPumps.splice(i, 1);
-                        break;
-                    }
-                }
-            }
-        });
-    });
+          }
+        }
+      });
+    }
+  );
 }
 
 window.onload = function () {

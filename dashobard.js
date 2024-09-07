@@ -16,17 +16,6 @@ firebase.analytics();
 
 let firestore = firebase.firestore();
 
-// Number filed
-let number = firebase.database().ref("randomNumber");
-
-function UpdateNumber() {
-  var element = document.getElementById("randomNumber");
-
-  number.set(parseInt(element.value));
-}
-
-
-
 //firebase data
 let pump_1 = firebase.database().ref("pumpe/pump1");
 let pump_2 = firebase.database().ref("pumpe/pump2");
@@ -45,7 +34,7 @@ pump_1.on("value", function (snapshot) {
   if (tempElement && timeElement && restHours && pumpImg) {
     tempElement.innerText = dataArray.temperature + "°C";
     timeElement.innerText = dataArray.activeHours + "H";
-    restHours.innerText = dataArray.restHours + "H"
+    restHours.innerText = dataArray.restHours + "H";
 
     pumpImg.setAttribute(
       "style",
@@ -68,7 +57,7 @@ pump_2.on("value", (snapshot) => {
   if (tempElement && timeElement && restHours && pumpImg) {
     tempElement.innerText = dataArray.temperature + "°C";
     timeElement.innerText = dataArray.activeHours + "H";
-    restHours.innerText = dataArray.restHours + "H"
+    restHours.innerText = dataArray.restHours + "H";
 
     pumpImg.setAttribute(
       "style",
@@ -91,7 +80,7 @@ pump_3.on("value", (snapshot) => {
   if (tempElement && timeElement && restHours && pumpImg) {
     tempElement.innerText = dataArray.temperature + "°C";
     timeElement.innerText = dataArray.activeHours + "H";
-    restHours.innerText = dataArray.restHours + "H"
+    restHours.innerText = dataArray.restHours + "H";
 
     pumpImg.setAttribute(
       "style",
@@ -114,7 +103,7 @@ pump_4.on("value", (snapshot) => {
   if (tempElement && timeElement && restHours && pumpImg) {
     tempElement.innerText = dataArray.temperature + "°C";
     timeElement.innerText = dataArray.activeHours + "H";
-    restHours.innerText = dataArray.restHours + "H"
+    restHours.innerText = dataArray.restHours + "H";
 
     pumpImg.setAttribute(
       "style",
@@ -124,3 +113,17 @@ pump_4.on("value", (snapshot) => {
     console.error("Elements for Pump 3 not found");
   }
 });
+
+function randomStringGenerator(length) {
+  var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  var randString = "";
+
+  for (var i = 0; i < length; i++) {
+    var index = Math.floor(Math.random() * chars.length);
+
+    randString += chars[index];
+  }
+
+  return randString;
+}
